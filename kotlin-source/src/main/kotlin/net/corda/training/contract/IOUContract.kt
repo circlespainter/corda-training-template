@@ -2,6 +2,7 @@ package net.corda.training.contract
 
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
+import net.corda.core.contracts.TypeOnlyCommandData
 import net.corda.core.contracts.requireSingleCommand
 import net.corda.core.transactions.LedgerTransaction
 import net.corda.training.state.IOUState
@@ -24,7 +25,7 @@ class IOUContract : Contract {
     interface Commands : CommandData {
         // Add commands here.
         // E.g
-        // class DoSomething : TypeOnlyCommandData(), Commands
+        class Issue : TypeOnlyCommandData(), CommandData
     }
 
     /**
@@ -32,7 +33,7 @@ class IOUContract : Contract {
      * The constraints are self documenting so don't require any additional explanation.
      */
     override fun verify(tx: LedgerTransaction) {
-        // Add contract code here.
+        tx.commands.requireSingleCommand<Commands.Issue>()
         // requireThat {
         //     ...
         // }
