@@ -48,6 +48,12 @@ class IOUContract : Contract {
             "The lender and borrower cannot have the same identity." using (
                 iouOutState.borrower != iouOutState.lender
             )
+
+            val cmd = tx.commands[0]
+
+            "Both lender and borrower together only may sign IOU issue transaction." using (
+                cmd.signers.toSet() == iouOutState.participants.map { it.owningKey }.toSet()
+            )
         }
     }
 }
