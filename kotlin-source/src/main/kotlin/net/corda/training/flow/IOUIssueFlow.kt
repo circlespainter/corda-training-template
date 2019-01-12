@@ -35,7 +35,10 @@ class IOUIssueFlow(val state: IOUState) : FlowLogic<SignedTransaction>() {
             TransactionState(state, IOUContract::class.qualifiedName!!, notary)
         )
         transaction.verify(serviceHub)
-        return serviceHub.signInitialTransaction(transaction)
+        val initialSignedTransaction = serviceHub.signInitialTransaction(transaction)
+        val requiredSigners = state.participants - ourIdentity
+        val flows = requiredSigners.map { initiateFlow(it) }
+        return subFlow(CollectSignaturesFlow(initialSignedTransaction, flows))
     }
 }
 
