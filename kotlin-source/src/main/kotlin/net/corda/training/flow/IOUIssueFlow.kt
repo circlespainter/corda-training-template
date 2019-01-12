@@ -30,12 +30,12 @@ class IOUIssueFlow(val state: IOUState) : FlowLogic<SignedTransaction>() {
     override fun call(): SignedTransaction {
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
         val command = Command(IOUContract.Commands.Issue(), state.participants.map { it.owningKey })
-        return serviceHub.signInitialTransaction(
-            TransactionBuilder(notary = notary).withItems(
-                command,
-                TransactionState(state, IOUContract::class.qualifiedName!!, notary)
-            )
+        val transaction = TransactionBuilder(notary = notary).withItems(
+            command,
+            TransactionState(state, IOUContract::class.qualifiedName!!, notary)
         )
+        transaction.verify(serviceHub)
+        return serviceHub.signInitialTransaction(transaction)
     }
 }
 
