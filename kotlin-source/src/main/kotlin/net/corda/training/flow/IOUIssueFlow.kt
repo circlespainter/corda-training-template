@@ -38,7 +38,8 @@ class IOUIssueFlow(val state: IOUState) : FlowLogic<SignedTransaction>() {
         val initialSignedTransaction = serviceHub.signInitialTransaction(transaction)
         val requiredSigners = state.participants - ourIdentity
         val flows = requiredSigners.map { initiateFlow(it) }
-        return subFlow(CollectSignaturesFlow(initialSignedTransaction, flows))
+        val withSignatures = subFlow(CollectSignaturesFlow(initialSignedTransaction, flows))
+        return subFlow(FinalityFlow(withSignatures))
     }
 }
 
